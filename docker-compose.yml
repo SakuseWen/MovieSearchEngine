@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:9.2.1
+    container_name: movie-search-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - ELASTIC_PASSWORD=${ES_PASSWORD}
+      - xpack.security.enabled=true
+      - xpack.security.http.ssl.enabled=true
+      - xpack.security.http.ssl.key=certs/http.key
+      - xpack.security.http.ssl.certificate=certs/http.crt
+      - xpack.security.http.ssl.certificate_authorities=certs/ca.crt
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+      - es_certs:/usr/share/elasticsearch/config/certs
+    networks:
+      - movie-search-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -k -u elastic:${ES_PASSWORD} https://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  backend:
+    build: .
+    container_name: movie-search-backend
+    environment:
+      - ES_HOST=https://elasticsearch:9200
+      - ES_USER=elastic
+      - ES_PASSWORD=${ES_PASSWORD}
+      - ES_CA_CERT_PATH=/certs/http_ca.crt
+      - TMDB_API_KEY=${TMDB_API_KEY}
+      - FLASK_DEBUG=False
+      - FLASK_PORT=5000
+    ports:
+      - "5000:5000"
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    volumes:
+      - es_certs:/certs:ro
+    networks:
+      - movie-search-network
+
+  frontend:
+    build:
+      context: ./电影搜索引擎网页 (1)
+      dockerfile: Dockerfile
+    container_name: movie-search-frontend
+    environment:
+      - VITE_API_URL=http://localhost:5000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - movie-search-network
+
+volumes:
+  es_data:
+    driver: local
+  es_certs:
+    driver: local
+
+networks:
+  movie-search-network:
+    driver: bridge
