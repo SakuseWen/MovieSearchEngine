@@ -4,6 +4,19 @@
 
 English | [简体中文](README.zh-CN.md)
 
+[![CI](https://github.com/SakuseWen/MovieSearchEngine/actions/workflows/ci.yml/badge.svg)](https://github.com/SakuseWen/MovieSearchEngine/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/)
+[![Node 16+](https://img.shields.io/badge/node-16+-green.svg)](https://nodejs.org/)
+
+---
+
+## 📚 Documentation
+
+- [API Documentation](API.md) - Complete API reference
+- [Contributing Guide](CONTRIBUTING.md) - How to contribute
+- [Screenshots & Features](SCREENSHOTS.md) - Visual showcase
+
 ## ✨ 功能特性
 
 - 🔍 全文搜索：支持电影标题、原标题和简介的多字段搜索
@@ -36,9 +49,35 @@ English | [简体中文](README.zh-CN.md)
 - Elasticsearch 9.x
 - TMDB API Key（从 [TMDB](https://www.themoviedb.org/settings/api) 获取）
 
-## 🚀 快速开始
+## 🚀 Quick Start
 
-### 1. 克隆项目
+### Option 1: Automated Setup (Windows)
+
+```bash
+# Run the setup script
+setup.bat
+```
+
+This will automatically:
+1. Create `.env` file from template
+2. Install Python dependencies
+3. Fetch movie data from TMDB
+4. Index data to Elasticsearch
+5. Install frontend dependencies
+
+### Option 2: Docker (Recommended for Production)
+
+```bash
+# Create .env file with your credentials
+cp .env.example .env
+
+# Start all services
+docker-compose up -d
+```
+
+### Option 3: Manual Setup
+
+#### 1. Clone the repository
 
 ```bash
 git clone https://github.com/SakuseWen/MovieSearchEngine.git
