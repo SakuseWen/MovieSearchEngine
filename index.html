@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Movie Search Engine</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            color: white;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        #search-box {
+            width: 60%;
+            margin: 0 auto;
+            display: block;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+        }
+        .movies {
+            margin-top: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+        .movie-card {
+            background: #222;
+            width: 240px;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 0 8px rgba(255,255,255,0.1);
+        }
+        .movie-card img {
+            width: 100%;
+            border-radius: 8px;
+        }
+        .title {
+            font-size: 18px;
+            margin-top: 8px;
+            font-weight: bold;
+        }
+        .overview {
+            margin-top: 6px;
+            font-size: 14px;
+            color: #ccc;
+            height: 80px;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Movie Search Engine</h1>
+
+<input id="search-box" type="text" placeholder="Search movies... (e.g. spider man)" />
+
+<div class="movies" id="results"></div>
+
+<script>
+document.getElementById("search-box").addEventListener("keyup", function(e) {
+    if (e.key === "Enter") {
+        searchMovies();
+    }
+});
+
+function searchMovies() {
+    const q = document.getElementById("search-box").value;
+    fetch(`http://127.0.0.1:5000/search?q=${encodeURIComponent(q)}`)
+        .then(res => res.json())
+        .then(data => {
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
+
+            data.results.forEach(movie => {
+                const poster = movie.poster || "";
+                const title = movie.title || "No Title";
+                const overview = movie.overview || "No overview available.";
+
+                const card = `
+                    <div class="movie-card">
+                        <img src="${poster}" alt="Poster">
+                        <div class="title">${title}</div>
+                        <div class="overview">${overview}</div>
+                    </div>
+                `;
+                resultsDiv.innerHTML += card;
+            });
+        })
+        .catch(err => {
+            console.error("Error when fetching:", err);
+            alert("请求失败，请检查 Flask 是否在运行。");
+        });
+}
+</script>
+
+</body>
+</html>
